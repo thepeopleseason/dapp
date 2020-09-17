@@ -1,0 +1,415 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+  <title>CMGdigital DAPP &amp; LSP</title>
+  <meta name="copyright"
+   content="Copyright &#169; 2007 CXRi" />
+  <link rel="stylesheet" type="text/css" media="screen, projection, print"
+   href="Slidy/slidy.css" />
+  <link rel="stylesheet" type="text/css" media="screen, projection, print"
+   href="Slidy/w3c-blue.css" />
+  <script src="Slidy/slidy.js"
+   type="text/javascript"></script>
+  <style type="text/css">
+  </style>
+</head>
+<body>
+
+<div class="background">
+  <img id="head-icon" alt="graphic with four colored squares"
+    src="Slidy/icon-blue.png" />
+</div>
+
+<div class="slide cover title">
+  <!-- hidden style graphics to ensure they are saved with other content -->
+  <img class="hidden" src="Slidy/bullet.png" alt="" />
+  <img class="hidden" src="Slidy/fold.gif" alt="" />
+  <img class="hidden" src="Slidy/unfold.gif" alt="" />
+  <img class="hidden" src="Slidy/fold-dim.gif" alt="" />
+  <img class="hidden" src="Slidy/nofold-dim.gif" alt="" />
+
+  <img class="hidden" src="Slidy/unfold-dim.gif" alt="" />
+  <img class="hidden" src="Slidy/bullet-fold.gif" alt="" />
+  <img class="hidden" src="Slidy/bullet-unfold.gif" alt="" />
+  <img class="hidden" src="Slidy/bullet-fold-dim.gif" alt="" />
+  <img class="hidden" src="Slidy/bullet-nofold-dim.gif" alt="" />
+  <img class="hidden" src="Slidy/bullet-unfold-dim.gif" alt="" />
+
+<h1>CMGdigital's DAPP &amp; LSP</h1>
+
+<p><a href="http://friendfeed.com/thepeopleseason">James Hsiao</a>,
+&lt;<a href="mailto:james.hsiao@cmgdigital.com">james.hsiao@cmgdigital.com</a>&gt;<br />
+</p>
+</div>
+
+<div class="slide">
+<h1> DAPP </h1>
+<center><img src="dapper.jpg"></center>
+</div>
+
+<div class="slide">
+<h1> DAPP </h1>
+<ul class="incremental">
+<li> Digital </li>
+<li> Audio </li>
+<li> Publishing Platform </li>
+</ul>
+</div>
+
+<div class="slide">
+<h1> DAPP </h1>
+<ul class="incremental">
+<li> Initially drove high pageviews to LSP on site. </li>
+<li> Created new advertising sales under RDS. </li>
+<li> Enabled song tagging with HD Radios for Apple iTunes sales. </li>
+</ul>
+</div>
+
+<div class="slide">
+<h1> Digital & Audio Architecture </h1>
+<ul class="incremental">
+<li> Digital Automation Server (usually Maestro) <ul class="incremental">
+     <li> DAS pushes metadata about every broadcast item (songs, commercials, station ID) </li>
+     </ul>
+</li>
+<li> Digi Device (Serial-to-IP conversion device) </li>
+<li> DAPP Software (running on Hydra) </li>
+</ul>
+</div>
+
+<div class="slide">
+<h1> Publishing Platform Architecture </h1>
+<ul class="incremental">
+<li> CMGd (nee CXRi) NetApp </li>
+<li> LSP Software
+<li> HD Radio Importers </li>
+<li> JumpGates </li>
+<li> Digi Devices </li>
+<li> RBDS Devices </li>
+<li> Third-party APIs (EveryZing) </li>
+<li> DAPP Software <ul class="incremental">
+     <li> Java-based </li>
+     <li> Concurrent connections to multiple servers </li>
+     <li> Object-oriented</li>
+     <li> Multi-threaded </li>
+</li>
+</ul>
+</div>
+
+<div class="slide">
+<h1> Architecture Diagram </h1> 
+<center><img src="dapp.png"></center>
+</div>
+
+<div class="slide">
+<h1> Objects & Threads </h1>
+<ul class="incremental">
+<li> Main Thread <ul class="incremental">
+     <li> Loads configurations </li>
+     <li> Creates threads to load individual station configs </li>
+     </ul>
+</li>
+<li> DasParser Object <ul class="incremental">
+     <li> Connects to DigiBox connected to DAS </li>
+     <li> Picks through data output by DAS </li>
+     </ul>
+</li>
+<li> Translator Object (Utility Object) <ul class="incremental">
+     <li> Reads database for translated song information </li>
+     </ul>
+</li>
+</ul>
+</div>
+
+<div class="slide">
+<h1> Objects & Threads (Pt. 2) </h1>
+<ul class="incremental">
+<li> NowPlayOutput <ul class="incremental">
+     <li> Writes NowPlay3.txt files for Java-based NowPlaying Applet</li>
+     <li> Still in place for use on Advertiser Resource Center </li>
+     </ul>
+</li>
+<li> SongHistOutput <ul class="incremental">
+     <li> Writes song_hist.txt files for Last Songs Played </li>
+     <li> Both NowPlay3.txt and song_hist.txt are rsync'd to production servers from hydra </li>
+     </ul>
+</li>
+<li> XMLOutput <ul class="incremental">
+     <li> Writes broadcast information in XML to Jumpgates </li>
+     <li> Replaces RBDSOutput Object </li>
+     <li> May utilize REX web service for song metadata </li>
+     </ul>
+</li>
+<li> HDPSDOutput <ul class="incremental">
+     <li> Writes song information to HD PSD Encoders for transmission to HD Radios </li>
+     <li> Uses a C library to communicate with HD importer </li>
+     <li> Uses SWIG to interface between Java & C Library </li>
+     </ul>
+</li>
+</ul>
+</div>
+
+<div class="slide">
+<h1> Objects & Threads (Pt. 3) </h1>
+<ul class="incremental">
+<li> RBDSOutput (deprecated) <ul class="incremental">
+     <li> Connects, via SSH or Telnet, to DigiBoxes interfacing with RDS Encoders </li>
+     <li> Encoders located at station transmission towers </li>
+     <li> Writes Song/Commercial information to Encoder to specify output </li>
+     </ul>
+</li>
+<li> HTTPOutput (experimental) <ul class="incremental">
+     <li> POSTs broadcast details to a URL </li>
+     <li> Messages transmitted via utf8 URI-encoded parameters </li>
+     </ul>
+</li>
+<li> DBOutput (experimental) <ul class="incremental">
+     <li> Writes received messages to database </li>
+     <li> Currently unused </li>
+     </ul>
+</li>
+</ul>
+</div>
+
+<div class="slide">
+<h1> Main Configuration </h1>
+<ul class="incremental">
+<li> digiprops.jpf <ul class="incremental">
+    <li> Main configuration file </li>
+    <li> <pre>
+pofdir:/var/lib/digi/pofdir-stable
+logfile:/var/lib/digi/logs/out-stable.log
+errfile:/var/lib/digi/logs/err-stable.log
+threadfile=/var/lib/digi/logs/thread-report.txt
+sleep:20
+listthreads:threads
+newpof:newpof
+restart:rs
+kill:kill
+dbuser=trans_lookup
+dbpass=<s>redacted</s>
+dburl=jdbc:mysql://10.0.8.11/cxri2</pre> </li>
+    </ul>
+</li>
+</ul>
+</div>
+
+<div class="slide">
+<h1> Station Configuration </h1>
+<ul class="incremental">
+<li> 'pof' files <ul class="incremental">
+    <li> Station configuration file </li>
+    <li> Usually named &lt;callsign&gt;.pof </li>
+    <li> 'mparse' and 'cparse' values </li>
+    <li> Contains Output Object configurations </li>
+</li>
+</ul>
+</div>
+
+<div class="slide">
+<h1> Sample Station Configuration </h1>
+<pre>
+name:wsrv
+id:10097
+fixcase:false
+host:10.150.139.240
+username:wsrv
+password:<s>redacted</s>
+prompt:Selection >
+command:1
+proto:net.cxri.Proto.Ssh
+parser:net.cxri.DasParser.Maestro1
+mparse:D
+cparse:CNQRSU
+loglevel:1
+
+out0:net.cxri.Output.SongHistOutput
+outinit0:/var/lib/digi/data/wsrv-fm/song_hist.txt|0
+
+out1:net.cxri.Output.NowPlayOutput
+outinit1:/var/lib/digi/data/wsrv-fm/NowPlay3.txt|ad_upsell_dir_obsolete|Atlanta's Classic Hits Station|
+
+out2:net.cxri.Output.RBDSOutput
+outinit2:net.cxri.Proto.Telnet|10.176.74.91|cxri|<s>redacted</s>|||97.1 THE RIVER|Atlanta's Classic Hits Station - 971theriver.com|vistigialadupsell.dat|5|6
+</pre>
+</div>
+
+<div class="slide">
+<h1> LSP: Last Songs Played </h1>
+<center><img src="Lisp.jpg"></center>
+<ul class="incremental">
+<li> Developed in 1999 in response to strategic research </li>
+<li> First of its kind</li>
+<li> Nothing close in non-Cox radio stations following 10 years of ever-expanding functionality </li>
+<li> Pageviews </li>
+<li> Hacked together with Perl, rewritten in 2006 </li>
+</ul>
+</div>
+
+<div class="slide">
+<h1> System Dependencies </h1>
+<ul class="incremental">
+<li> DAPP </li>
+<li> rsync </li>
+<li> All Music Guide data </li>
+<li> iTunes Music Store data </li>
+<li> Amazon Music data </li>
+</ul>
+</div>
+
+<div class="slide">
+<h1> Site-side Output </h1>
+<ul class="incremental">
+<li> All pages: <a href="http://b985.com/">Now Playing</a> <ul class="incremental">
+     <li> Javascript-based display of currently-playing content </li>
+     </ul>
+</li>
+<li> Main page: <a href="http://b985.com/lsp/">/lsp/</a> </li>
+<li> HTML::Mason </li>
+<li> Pulls directly from DB </li>
+</ul>
+</div>
+
+<div class="slide">
+<h1> Site-side Output </h1>
+<ul class="incremental">
+<li> Nowplaying XML <ul class="incremental">
+     <li> <a href="http://b985.com/_svc/np.xml">/_svc/np.xml</a> </li>
+     <li> <a href="http://streaming.b985.com/_players/coxradio/index.php?callsign=WSBFM">Streaming Player</a> </li>
+     <li> Created for third-party relationship with StreamtheWorld </li>
+     <li> <pre>
+&lt;stwcue version="1">
+&lt;mount>WSB_FM&lt;/mount>
+&lt;cuepoint type="track" cache="true">
+&lt;attributes>
+&lt;attribute name="cue_title">Will You Still Love Me?&lt;/attribute>
+&lt;attribute name="cue_time_start">1264005862&lt;/attribute>
+&lt;attribute name="cue_time_duration">246000&lt;/attribute>
+&lt;attribute name="track_artist_name">Chicago&lt;/attribute>
+&lt;attribute name="track_album_publisher">Rhino&lt;/attribute>
+&lt;attribute name="custom_track_link">http://b985.com/music/track/915/&lt;/attribute>
+&lt;attribute name="track_album_name">Best of Chicago: 40th Anniversary Edition&lt;/attribute>
+&lt;attribute name="custom_amazon_cd_link">
+http://www.amazon.com/Best-Chicago-40th-Anniversary/dp/B000YD7B6E?SubscriptionId=1NXYFBZST44V8CCDK182&tag=coxradiointer-20&linkCode=xm2&camp=2025&creative=165953&creativeASIN=B000YD7B6E
+&lt;/attribute>
+&lt;attribute name="custom_amazon_mp3_link">
+http://www.amazon.com/Best-Chicago-40th-Anniversary/dp/B00122J0HY?SubscriptionId=1NXYFBZST44V8CCDK182&tag=coxradiointer-20&linkCode=xm2&camp=2025&creative=165953&creativeASIN=B00122J0HY
+&lt;/attribute>
+&lt;attribute name="custom_itunes_link">
+http://click.linksynergy.com/fs-bin/click?id=rFni20t/y08&subid=&offerid=146261.1&type=10&tmpid=3909&RD_PARM1=http%3A%2F%2Fitunes.apple.com%2Fus%2Falbum%2Fwill-you-still-love-me%2Fid265625949%3Fi%3D265626726%2526uo%3D4
+&lt;/attribute>
+&lt;attribute name="custom_lyrics_url">http://b985.com/music/track/915/#lyrics&lt;/attribute>
+&lt;attribute name="custom_amghearit_url">
+http://b985.com/p/music/hear_it.cgi?lsp=915&id=075992550925&track=5&disk=1&sub=lsp
+&lt;/attribute>...
+</pre> </li> </ul>
+</li></ul>
+</div>
+
+<div class="slide">
+<h1> Site-side Output </h1>
+<ul class="incremental">
+<li> Widget Data File <ul class="incremental">
+     <li> /_svc/lsp-widget.txt </li>
+     <li> Created for use with embeddable Flash widgets </li>
+     <li> <pre>
+logo=&lt;a href="http://b985.com/">&lt;img
+src="http://b985.com/templates/station_logo_widgets.gif" />&lt;/a>
+&metrics=http://b985.com/
+&displayText=&lt;b>&lt;font
+color="#666666">4:48p.m.%20&lt;/font>&lt;/b>&lt;br>&lt;u>&lt;a
+href="http://b985.com/music/track.html?track_id=881">Everything%20You%20Want&lt;/a>&lt;/u>&lt;font
+color="#666666"> by &lt;/font>&lt;u>&lt;a
+href="http://b985.com/p/music/profile.cgi?artist_id=202600">Vertical
+Horizon&lt;/a>&lt;/u>&lt;br />&lt;br />&lt;b>&lt;font
+color="#666666">4:44p.m.%20&lt;/font>&lt;/b>&lt;br>&lt;u>&lt;a
+href="http://b985.com/music/track.html?track_id=915">Will%20You%20Still%20Love%20Me%3F&lt;/a>&lt;/u>&lt;font
+color="#666666"> by &lt;/font>&lt;u>&lt;a
+href="http://b985.com/p/music/profile.cgi?artist_id=3885">Chicago&lt;/a>&lt;/u>
+&lastUpdate=last updated: 4:48p.m.
+</li>
+</ul>
+</div>
+
+<div class="slide">
+<h1> Server Software (Primary Daemons) </h1>
+<ul class="incremental">
+<li> makelastsongs <ul class="incremental">
+     <li> Perl daemon </li>
+     <li> Processes song_hist.txt files rsync'd from DAPP machine. </li>
+     <li> Matches songs with existing records in database, or creates new songs from AMG & DAS data </li>
+     <li> Records playtimes and metadata for Music License Fee reporting purposes </li>
+     <li> Archives lsp3_history table in database on a monthly basis. </li>
+     </ul>
+</li>
+<li> lsp_trailer <ul class="incremental">
+     <li> Perl daemon </li>
+     <li> Searches most recently added tracks to LSP tracks table. </li>
+     <li> Populates fields for tracks lacking meta-data <ul>
+          <li> Lyrics Info </li>
+          <li> Music Video Info </li>
+          <li> Amazon & iTunes Links </li>
+          </ul>
+</ul>
+</div>
+
+<div class="slide">
+<h1> Server Software (Support Crons) </h1>
+<ul>
+<li> update_amg_video</li>
+<li> update_lyrics</li>
+<li> update_artist_images</li>
+<li> update_trailers</li>
+<li> get_current_tours</li>
+<li> get_current_featured_ads</li>
+<li> get_featured_artists</li>
+<li> make_touring_artists_include</li>
+<li> make_music_crawls</li>
+<li> lsp_history.pl (reporting) </li>
+</ul>
+</div>
+
+<div class="slide">
+<h1> On the Horizon </h1>
+<ul class="incremental">
+<li> Memcached <ul class="incremental">
+     <li> Pulling NowPlaying data from Memcached vs. Database lookup. </li>
+     <li> Cached information stored in JSON format </li>
+     <li> <pre>
+{"Lyrics":{"link":"&lt;a
+href=\"/music/track/3/#lyrics\">lyrics&lt;/a>","url":"/music/track/3/#lyrics"},"AMGHearit":{"link":"&lt;a
+href=\"/p/music/hear_it.cgi?lsp=3&amp;id=828768817421&amp;track=4&amp;disk=1&amp;sub=lsp\"
+onClick=\"return
+hear_it('/p/music/hear_it.cgi?lsp=3&id=828768817421&track=4&disk=1&sub=lsp')\">hear
+it&lt;/a>","url":"/p/music/hear_it.cgi?lsp=3&id=828768817421&track=4&disk=1&sub=lsp"},"Amazon":{"fetch_date":"2009-11-16"},"Itunes":{"trackViewUrl":"http://itunes.apple.com/us/album/my-love-feat-t-i/id268167344?i=268167655&uo=4","artistName":"Justin
+Timberlake","affiliate_link":"http://click.linksynergy.com/fs-bin/click?id=rFni20t/y08&subid=&offerid=146261.1&type=10&tmpid=3909&RD_PARM1=http%3A%2F%2Fitunes.apple.com%2Fus%2Falbum%2Fmy-love-feat-t-i%2Fid268167344%3Fi%3D268167655%2526uo%3D4","artistViewUrl":"http://itunes.apple.com/us/artist/justin-timberlake/id398128?uo=4","collectionName":"FutureSex/LoveSounds
+(Deluxe
+Edition)","trackExplicitness":"notExplicit","artworkUrl100":"http://a1.phobos.apple.com/us/r1000/022/Music/fe/d2/1e/mzi.rvypeuze.100x100-75.jpg","collectionExplicitness":"notExplicit","collectionCensoredName":"FutureSex/LoveSounds
+(Deluxe
+Edition)","fetch_date":"2009-11-16","collectionViewUrl":"http://itunes.apple.com/us/album/my-love-feat-t-i/id268167344?i=268167655&uo=4","trackName":"My
+Love","trackCensoredName":"My Love (feat. T.I.)"}} </pre></li>
+     </ul>
+</ul>
+</div>
+
+<div class="slide">
+<h1> Win a prize! </h1>
+<ul>
+<li>Why did I use a picture of George Clooney to introduce my DAPP section?</li>
+</ul>
+</div>
+
+<div class="slide">
+<h1> Questions? </h1>
+<ul class="incremental">
+<li> Anyone? </li>
+<li> Anyone? </li>
+<li> <center><img src="stein.jpg"></center><br/> Something...D-O-O Economics? </li>
+<li> Voodoo Economics? </li>
+</ul></div>
+
+
+</body>
+</html>
